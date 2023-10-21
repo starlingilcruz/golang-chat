@@ -2,15 +2,22 @@ package main
 
 import (
 	"fmt"
+	"time"
+	"net/http"
+	"github.com/gorilla/mux"
 
 	"github.com/joho/godotenv"
 
 	"github.com/starlingilcruz/golang-chat/internal/db"
 	"github.com/starlingilcruz/golang-chat/internal/models"
+	"github.com/starlingilcruz/golang-chat/http/routes"
+	
 )
 
 
 func main() {
+	fmt.Println("Starting Server...")
+	
 	// Load env values
 	err := godotenv.Load()
 	if err != nil {
@@ -23,4 +30,24 @@ func main() {
 	dbi := db.GetInstance()
 	dbi.AutoMigrate(models.Tables...)
 	fmt.Println("Database tables migrated")
+
+	StartHttpServer()
+}
+
+func StartHttpServer() {
+	r := mux.NewRouter()
+	routes.RegisterAuthRoutes(r)
+
+	srv := &http.Server{
+		Handler: r,
+		Addr:    "127.0.0.1:8000",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("err")
 }
