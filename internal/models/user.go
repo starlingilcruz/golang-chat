@@ -2,7 +2,8 @@ package models
 
 import (
 	"gorm.io/gorm"
-	// "gorm.io/driver/postgres"
+
+	"github.com/starlingilcruz/golang-chat/internal/db"
 )
 
 type User struct {
@@ -13,6 +14,14 @@ type User struct {
 	Password	string `json:"Password,omitempty"`
 }
 
-func (u *User) GetUserByEmail(email string) *gorm.DB {
+func (u *User) Create() *gorm.DB {
+	return db.GetInstance().Create(&u)
+}
 
+func (u *User) GetByUsername(username string) *gorm.DB {
+	return db.GetInstance().Where("Username = ?", username).First(&u)
+}
+
+func (u *User) GetByEmail(email string) *gorm.DB {
+	return db.GetInstance().Where("Email = ?", email).First(&u)
 }

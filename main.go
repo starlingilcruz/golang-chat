@@ -2,16 +2,25 @@ package main
 
 import (
 	"fmt"
-	
-	"github.com/starlingilcruz/golang-chat/connection"
+
+	"github.com/joho/godotenv"
+
+	"github.com/starlingilcruz/golang-chat/internal/db"
+	"github.com/starlingilcruz/golang-chat/internal/models"
 )
 
+
 func main() {
-	fmt.Println("Hello Word")
+	// Load env values
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+		return
+	}
 
 	// instantiate mux routes
-
-	db, err := ConnectDB()
-
-
+	db.Connect()
+	dbi := db.GetInstance()
+	dbi.AutoMigrate(models.Tables...)
+	fmt.Println("Database tables migrated")
 }
