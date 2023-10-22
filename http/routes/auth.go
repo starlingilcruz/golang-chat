@@ -4,13 +4,15 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/starlingilcruz/golang-chat/controllers"
+	"github.com/starlingilcruz/golang-chat/http/middlewares"
 	"github.com/starlingilcruz/golang-chat/services"
 )
 
 func RegisterAuthRoutes(router *mux.Router) {
 
 	sr := router.PathPrefix("/v1/api/auth").Subrouter()
-	// sr.Use(middlewares.HeaderMiddleware)
+	// Add content-type json to all sub-routes
+	sr.Use(middlewares.HeaderMiddleware)
 
 	var auth controllers.AuthController
 	auth.RegisterService(services.Auth{})
