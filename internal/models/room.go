@@ -13,6 +13,10 @@ type Room struct {
 	Members []User   `gorm:"many2many:room_users;"`
 }
 
+func (r *Room)GetById(id uint, room *Room) *gorm.DB {
+	return db.GetInstance().Where("ID = ?", id).First(&r)
+}
+
 func (r *Room)Create() *gorm.DB {
 	return db.GetInstance().Create(&r)
 }

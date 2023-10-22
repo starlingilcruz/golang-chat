@@ -25,5 +25,4 @@ func (u *User) GetByUsername(username string) *gorm.DB {
 func (u *User) GetByEmail(email string) *gorm.DB {
 	r := db.GetInstance().Find(&u, User{Email: email})
 	return r
-	// return db.GetInstance().Where("Email = ?", email).First(&u)
 }
