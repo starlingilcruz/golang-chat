@@ -21,6 +21,7 @@ func (c *Chat)Create() *gorm.DB {
 }
 
 func (c *Chat)List(roomId uint, ch *[]Chat) *gorm.DB {
-	res := db.GetInstance().Where(Chat{RoomId: roomId}).Preload("Room").Preload("User").Order("id DESC").Find(&ch).Limit(50)
-	return res 
+	// res := db.GetInstance().Where(Chat{Room: roomId}).Preload("Room").Preload("User").Order("id DESC").Find(&ch).Limit(50)
+	// return res
+	return nil 
 }

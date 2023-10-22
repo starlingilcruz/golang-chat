@@ -30,7 +30,6 @@ func (a *Room) List() ([]models.Room, error) {
 	
 	if err != nil {
 		fmt.Println("Error retrieving rooms")
-		fmt.Println(rooms)
 	}
 
 	return rooms, nil

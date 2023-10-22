@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"log"
 	"github.com/gorilla/mux"
 
 	"github.com/starlingilcruz/golang-chat/controllers"
@@ -9,6 +10,8 @@ import (
 )
 
 func RegisterRoomRoutes(router *mux.Router) {
+
+	log.Println("--- configuring room http routes")
 
 	sr := router.PathPrefix("/v1/api/rooms").Subrouter()
 	// Add content-type json to all sub-routes
