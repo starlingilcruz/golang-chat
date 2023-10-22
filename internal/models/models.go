@@ -1,3 +1,3 @@
 package models
 
-var Tables = []interface{}{&User{}}
+var Tables = []interface{}{&User{}, &Room{}}

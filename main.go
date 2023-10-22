@@ -39,6 +39,7 @@ func main() {
 func StartHttpServer() {
 	r := mux.NewRouter()
 	routes.RegisterAuthRoutes(r)
+	routes.RegisterRoomRoutes(r)
 
 	handler := middlewares.CORS(r)
 
