@@ -11,6 +11,8 @@ import (
 	"github.com/starlingilcruz/golang-chat/internal/db"
 	"github.com/starlingilcruz/golang-chat/internal/models"
 	"github.com/starlingilcruz/golang-chat/http/routes"
+	"github.com/starlingilcruz/golang-chat/http/middlewares"
+
 	
 )
 
@@ -38,10 +40,11 @@ func StartHttpServer() {
 	r := mux.NewRouter()
 	routes.RegisterAuthRoutes(r)
 
+	handler := middlewares.CORS(r)
+
 	srv := &http.Server{
-		Handler: r,
+		Handler: handler,
 		Addr:    "127.0.0.1:8000",
-		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
