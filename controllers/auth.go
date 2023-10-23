@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-
 	"github.com/starlingilcruz/golang-chat/services"
 	"github.com/starlingilcruz/golang-chat/utils"
 	"github.com/starlingilcruz/golang-chat/http/requests"

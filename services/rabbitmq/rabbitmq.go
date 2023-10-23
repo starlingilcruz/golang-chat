@@ -4,12 +4,11 @@ import (
 	"log"
 	"fmt"
 	"os"
+	
 	amqp "github.com/rabbitmq/amqp091-go"
-
 )
 
 var br Broker
-
 
 func Connect() (*amqp.Connection, *amqp.Channel) {
 	amqHost := os.Getenv("RMQ_HOST")

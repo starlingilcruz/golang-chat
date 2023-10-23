@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/starlingilcruz/golang-chat/internal/models"
-	// "github.com/starlingilcruz/golang-chat/utils"
 )
 
 
@@ -34,4 +33,3 @@ func (a *Room) List() ([]models.Room, error) {
 
 	return rooms, nil
 }
-

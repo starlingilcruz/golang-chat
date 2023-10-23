@@ -1,9 +1,6 @@
 package websocket
 
-import (
-	"log"
-
-)
+import "log"
 
 type Pool struct {
 	Register   chan *Client
@@ -79,7 +76,7 @@ func (p *Pool) AddClient(client *Client) {
 
 func (p *Pool) ReviveWebsocket() {
 	if err := recover(); err != nil {
-		log.Println("level", "error", "err", err)
+		log.Println("Revive websocket: ", err)
 		go p.Start()
 	}
 }

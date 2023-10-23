@@ -6,6 +6,7 @@ import (
 
 	"github.com/starlingilcruz/golang-chat/services/websocket"
 	"github.com/starlingilcruz/golang-chat/utils"
+	
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -53,7 +54,6 @@ func (b *Broker) SetUp(ch *amqp.Channel) {
 	b.Channel = ch
 }
 
-// messageTransformer converts the message from rabbitmq to StockResponse type and passes it to the received messages channel
 func messageTransformer(entries <-chan amqp.Delivery, receivedMessages chan StockResponse) {
 	var sr StockResponse
 	for d := range entries {
@@ -67,7 +67,6 @@ func messageTransformer(entries <-chan amqp.Delivery, receivedMessages chan Stoc
 	}
 }
 
-// processResponse sends the stock response to the websocket's connection pool
 func processResponse(s <-chan StockResponse, b *Broker, pool *websocket.Pool) {
 	for r := range s {
 		log.Println("processing stock response for ", r.Message)

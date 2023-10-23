@@ -13,18 +13,18 @@ import (
 var RegisterWebSocketRoutes = func(router *mux.Router) {
 
 	// TODO v2 - handle pool registry and to support multiple pools
-
+	
 	log.Println("--- configuring ws routes")
 	pool := websocket.StartNewWebSocketPool()
 
 	sb := router.PathPrefix("/v1").Subrouter()
 	sb.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 
+		// roomId := r.URL.Query().Get("roomId")
 		token := r.URL.Query().Get("token")
 		claims, _ := utils.VerifyJWT(token)
 
 		// TODO handle unauthenticated request
-
 		clientUser := websocket.User{
 			Email:      claims["email"].(string),
 			UserId:     uint(claims["userid"].(float64)),
@@ -51,7 +51,6 @@ func addWsClientToPool(pool *websocket.Pool, user websocket.User, w http.Respons
 	}
 
 	pool.AddClient(client)
-
 	bodyChannel := make(chan []byte)
 	go client.Read(bodyChannel)
 	go br.ReadMessages(pool)

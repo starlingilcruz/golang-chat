@@ -20,6 +20,11 @@ func RegisterRoomRoutes(router *mux.Router) {
 	var room controllers.RoomController
 	room.RegisterService(services.Room{})
 
+	var chat controllers.ChatController
+	chat.RegisterService(services.Chat{})
+
 	sr.HandleFunc("/", room.List).Methods("POST")
 	sr.HandleFunc("/create", room.Create).Methods("POST")
+	sr.HandleFunc("/{id}/messages", chat.GetMessages).Methods("GET")
+
 }

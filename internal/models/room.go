@@ -4,7 +4,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/starlingilcruz/golang-chat/internal/db"
-
 )
 
 type Room struct {
