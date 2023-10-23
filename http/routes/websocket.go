@@ -5,29 +5,29 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	gws "github.com/gorilla/websocket"
+	//gws "github.com/gorilla/websocket"
 
 	"github.com/starlingilcruz/golang-chat/services/websocket"
 	"github.com/starlingilcruz/golang-chat/services/rabbitmq"
 	"github.com/starlingilcruz/golang-chat/utils"
 )
 
-type Tenant struct {
+type Channel struct {
 	Pool   *websocket.Pool
 	Broker *rabbitmq.Broker
 }
 
-type TenantRegistry struct {
-	Room   map[string]*Tenant
+type ChannelRegistry struct {
+	Room   map[string]*Channel
 }
 
 var RegisterWebSocketRoutes = func(router *mux.Router) {
 
-	tenantRegistry := TenantRegistry{
-		Room:   make(map[string]*Tenant),
-	}
-
 	log.Println("--- configuring ws routes")
+
+	channelRegistry := ChannelRegistry{
+		Room:   make(map[string]*Channel),
+	}
 
 	sb := router.PathPrefix("/v1").Subrouter()
 	sb.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -50,39 +50,36 @@ var RegisterWebSocketRoutes = func(router *mux.Router) {
 			return
 		}
 
-		addWsClientToPool(conn, &tenantRegistry, roomId, clientUser)
+		broadcast := make(chan []byte)
+		pool, _   := registerChannelDeps(&channelRegistry, roomId, broadcast)
+
+		client := &websocket.Client{
+			Connection: conn,
+			Pool:       pool,
+			User:       clientUser,
+		}
+	
+		pool.AddClient(client)
+		go client.Read(broadcast)
 	})
 }
 
-func addWsClientToPool(conn *gws.Conn, registry *TenantRegistry, roomId string, user websocket.User) {
+func registerChannelDeps(registry *ChannelRegistry, roomId string, broadcast chan []byte) (*websocket.Pool, *rabbitmq.Broker) {
+	channel := registry.Room[roomId]
 
-	tenant := registry.Room[roomId]
-
-	if tenant == nil {
-		pool := websocket.StartNewWebSocketPool()
-		br   := rabbitmq.GetRabbitMQBroker()
-
-		tenant = &Tenant{
-			Pool:    pool,
-			Broker:  br,
+	if channel == nil {
+		channel = &Channel{
+			Pool:    websocket.StartNewWebSocketPool(),
+			Broker:  rabbitmq.GetRabbitMQBroker(),
 		}
-		registry.Room[roomId] = tenant
+		registry.Room[roomId] = channel
 	}
 
-	rabbitmq.GetRabbitMQBroker()
+	pool := channel.Pool
+	br   := channel.Broker
 
-	pool := tenant.Pool
-	br   := tenant.Broker
-
-	client := &websocket.Client{
-		Connection: conn,
-		Pool:       pool,
-		User:       user,
-	}
-
-	pool.AddClient(client)
-	bodyChannel := make(chan []byte)
-	go client.Read(bodyChannel)
 	go br.ReadMessages(pool)
-	go br.PublishMessage(bodyChannel)
-}
+	go br.PublishMessage(broadcast)
+
+	return pool, br
+}	
