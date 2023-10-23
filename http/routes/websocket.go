@@ -1,14 +1,12 @@
 package routes
 
 import (
-	// "encoding/json"
-	// "fmt"
 	"log"
 	"net/http"
-	// "os"
 
 	"github.com/gorilla/mux"
 	"github.com/starlingilcruz/golang-chat/services/websocket"
+	"github.com/starlingilcruz/golang-chat/services/rabbitmq"
 	"github.com/starlingilcruz/golang-chat/utils"
 )
 
@@ -44,14 +42,18 @@ func addWsClientToPool(pool *websocket.Pool, user websocket.User, w http.Respons
 		log.Println(err)
 	}
 
+	br := rabbitmq.GetRabbitMQBroker()
+
 	client := &websocket.Client{
 		Connection: conn,
 		Pool:       pool,
 		User:       user,
 	}
 
-	// pool.AddClient(client)
-	pool.Register <- client
-	requestBody := make(chan []byte)
-	go client.Read(requestBody)
+	pool.AddClient(client)
+
+	bodyChannel := make(chan []byte)
+	go client.Read(bodyChannel)
+	go br.ReadMessages(pool)
+	go br.PublishMessage(bodyChannel)
 }

@@ -2,8 +2,6 @@ package websocket
 
 import (
 	"log"
-	"os"
-	"runtime/debug"
 
 )
 
@@ -30,18 +28,29 @@ func (p *Pool) Start() {
 		select {
 		case client := <-p.Register:
 			p.Clients[client] = true
-			log.Println("info:", "New client. Size of connection pool:", len(p.Clients))
+			log.Println("WS: new client. Pool size:", len(p.Clients))
 			for c := range p.Clients {
-				err := c.Connection.WriteJSON(Message{Type: 2, Body: Body{Message: "new user joined..."}})
+				err := c.Connection.WriteJSON(
+					Message{
+						Type: 2, 
+						Body: Body{Message: "new user joined..."},
+					},
+				)
 				log.Println(err)
 			}
 
 		case client := <-p.Unregister:
-			// remove client from pool
 			delete(p.Clients, client)
-			log.Println("info:", "disconnected a client. size of connection pool:", len(p.Clients))
+			log.Println("WS: client disconnected. Pool size: ", len(p.Clients))
+		
 			for c := range p.Clients {
-				err := c.Connection.WriteJSON(Message{Type: 3, Body: Body{Message: "user disconnected..."}})
+				err := c.Connection.WriteJSON(
+					Message{
+						Type: 3, 
+						Body: 
+						Body{Message: "user disconnected..."},
+					},
+				)
 				log.Println(err)
 			}
 
@@ -70,18 +79,7 @@ func (p *Pool) AddClient(client *Client) {
 
 func (p *Pool) ReviveWebsocket() {
 	if err := recover(); err != nil {
-		if os.Getenv("LOG_PANIC_TRACE") == "true" {
-			log.Println(
-				"level:", "error",
-				"err: ", err,
-				"trace", string(debug.Stack()),
-			)
-		} else {
-			log.Println(
-				"level", "error",
-				"err", err,
-			)
-		}
+		log.Println("level", "error", "err", err)
 		go p.Start()
 	}
 }
