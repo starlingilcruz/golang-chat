@@ -5,25 +5,37 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	gws "github.com/gorilla/websocket"
+
 	"github.com/starlingilcruz/golang-chat/services/websocket"
 	"github.com/starlingilcruz/golang-chat/services/rabbitmq"
 	"github.com/starlingilcruz/golang-chat/utils"
 )
 
+type Tenant struct {
+	Pool   *websocket.Pool
+	Broker *rabbitmq.Broker
+}
+
+type TenantRegistry struct {
+	Room   map[string]*Tenant
+}
+
 var RegisterWebSocketRoutes = func(router *mux.Router) {
 
-	// TODO v2 - handle pool registry and to support multiple pools
-	
+	tenantRegistry := TenantRegistry{
+		Room:   make(map[string]*Tenant),
+	}
+
 	log.Println("--- configuring ws routes")
-	pool := websocket.StartNewWebSocketPool()
 
 	sb := router.PathPrefix("/v1").Subrouter()
 	sb.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 
-		// roomId := r.URL.Query().Get("roomId")
-		token := r.URL.Query().Get("token")
+		roomId    := r.URL.Query().Get("roomId")
+		token     := r.URL.Query().Get("token")
 		claims, _ := utils.VerifyJWT(token)
-
+		
 		// TODO handle unauthenticated request
 		clientUser := websocket.User{
 			Email:      claims["email"].(string),
@@ -31,18 +43,36 @@ var RegisterWebSocketRoutes = func(router *mux.Router) {
 			UserName:   claims["username"].(string),
 		}
 
-		addWsClientToPool(pool, clientUser, w, r)
+		conn, err := websocket.Upgrade(w, r)
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		addWsClientToPool(conn, &tenantRegistry, roomId, clientUser)
 	})
 }
 
-func addWsClientToPool(pool *websocket.Pool, user websocket.User, w http.ResponseWriter, r *http.Request) {
-	conn, err := websocket.Upgrade(w, r)
+func addWsClientToPool(conn *gws.Conn, registry *TenantRegistry, roomId string, user websocket.User) {
 
-	if err != nil {
-		log.Println(err)
+	tenant := registry.Room[roomId]
+
+	if tenant == nil {
+		pool := websocket.StartNewWebSocketPool()
+		br   := rabbitmq.GetRabbitMQBroker()
+
+		tenant = &Tenant{
+			Pool:    pool,
+			Broker:  br,
+		}
+		registry.Room[roomId] = tenant
 	}
 
-	br := rabbitmq.GetRabbitMQBroker()
+	rabbitmq.GetRabbitMQBroker()
+
+	pool := tenant.Pool
+	br   := tenant.Broker
 
 	client := &websocket.Client{
 		Connection: conn,
