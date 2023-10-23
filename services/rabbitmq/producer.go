@@ -8,7 +8,6 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-// PublishMessage sends messages to the stock-bot's receiver queue
 func (b *Broker) PublishMessage(requestBody chan []byte) {
 	for body := range requestBody {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -27,6 +26,5 @@ func (b *Broker) PublishMessage(requestBody chan []byte) {
 			log.Printf("PublishMessage Error occured %s\n", err)
 			continue
 		}
-		log.Printf(" [x] Sent %s\n", body)
 	}
 }

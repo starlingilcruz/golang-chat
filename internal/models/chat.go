@@ -4,7 +4,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/starlingilcruz/golang-chat/internal/db"
-
 )
 
 type Chat struct {
@@ -20,8 +19,6 @@ func (c *Chat)Create() *gorm.DB {
 	return db.GetInstance().Create(&c)
 }
 
-func (c *Chat)List(roomId uint, ch *[]Chat) *gorm.DB {
-	// res := db.GetInstance().Where(Chat{Room: roomId}).Preload("Room").Preload("User").Order("id DESC").Find(&ch).Limit(50)
-	// return res
-	return nil 
+func (c *Chat)List(roomId string, ch *[]Chat) *gorm.DB {
+	return db.GetInstance().Where("room_id = ?", roomId).Preload("User").Order("created_at ASC").Find(&ch).Limit(50)
 }

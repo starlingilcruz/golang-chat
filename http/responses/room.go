@@ -10,3 +10,8 @@ type RoomResponse struct {
 type RoomsResponse struct {
 	Rooms  []models.Room `json:"Rooms"`
 }
+
+
+type RoomMessagesResponse struct {
+	Messages  []models.Chat `json:"Messages"`
+}

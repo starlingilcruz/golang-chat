@@ -8,10 +8,6 @@ import (
   "gorm.io/gorm"
 )
 
-// type Database struct {
-// 	Instance *gorm.DB
-// }
-
 var (
 	db *gorm.DB
 )
@@ -44,7 +40,3 @@ func Connect() error {
 func GetInstance() *gorm.DB {
 	return db
 }
-
-// func (d *Database) GetInstance() *gorm.DB {
-// 	return d.Instance
-// }

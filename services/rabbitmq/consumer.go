@@ -6,7 +6,6 @@ import (
 	"github.com/starlingilcruz/golang-chat/services/websocket"
 )
 
-// ReadMessages reads messages from the stock-bot's publisher queue
 func (b *Broker) ReadMessages(pool *websocket.Pool) {
 	msgs, err := b.Channel.Consume(
 		b.ConsumerQueue.Name, // queue
@@ -17,8 +16,9 @@ func (b *Broker) ReadMessages(pool *websocket.Pool) {
 		false,                // no-wait
 		nil,                  // args
 	)
+	
 	if err != nil {
-		log.Printf("ReadMessages Error occured %s\n", err)
+		log.Printf("ReadMessages error occured %s\n", err)
 		return
 	}
 

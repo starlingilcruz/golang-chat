@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
-	// "github.com/starlingilcruz/golang-chat/services"
+	"github.com/starlingilcruz/golang-chat/services"
 )
 
 type Client struct {
@@ -43,8 +43,6 @@ func (c *Client) Read(channel chan []byte) {
 	}()
 	defer c.Pool.ReviveWebsocket()
 
-	// var repo services.ChatRepository = services.NewRepository()
-
 	for {
 		mType, payload, err := c.Connection.ReadMessage()
 		
@@ -53,6 +51,7 @@ func (c *Client) Read(channel chan []byte) {
 
 		if err != nil {
 			fmt.Println(err)
+			return
 		}
 
 		body.User = c.User.UserName
@@ -63,7 +62,8 @@ func (c *Client) Read(channel chan []byte) {
 		if strings.Index(body.Message, "/stock=") == 0 {
 			channel <- payload
 		} else {
-			// repo.SaveChatMessage(body.Message, uint(body.RoomId), c.User.UserId)
+			var repo services.ChatRepository = services.NewRepository()
+			repo.SaveChatMessage(body.Message, uint(body.RoomId), c.User.UserId)
 		}
 	}
 }

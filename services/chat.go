@@ -7,17 +7,30 @@ import (
 )
 
 
-type chat struct{}
+type Chat struct{}
 
 type ChatRepository interface {
+	GetRoomMessages(roomId string) ([]models.Chat, error)
 	SaveChatMessage(msg string, roomId, userId uint) bool
 }
 
-func NewRepository() *chat {
-	return &chat{}
+func NewRepository() *Chat {
+	return &Chat{}
 }
 
-func (c *chat) SaveChatMessage(msg string, roomId, userId uint) bool {
+func (c *Chat)GetRoomMessages(roomId string) ([]models.Chat, error) {
+	var chats []models.Chat
+	var model models.Chat
+	err := model.List(roomId, &chats)
+	
+	if err != nil {
+		log.Println("Error retrieving chats")
+	}
+
+	return chats, nil
+}
+
+func (c *Chat)SaveChatMessage(msg string, roomId, userId uint) bool {
 	log.Println("--saving chat message")
 
 	ch := models.Chat{
