@@ -26,6 +26,5 @@ func (b *Broker) PublishMessage(requestBody chan []byte) {
 			log.Printf("PublishMessage Error occured %s\n", err)
 			continue
 		}
-		log.Printf(" [x] Sent %s\n", body)
 	}
 }

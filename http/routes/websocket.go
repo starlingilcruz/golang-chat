@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	//gws "github.com/gorilla/websocket"
 
 	"github.com/starlingilcruz/golang-chat/services/websocket"
 	"github.com/starlingilcruz/golang-chat/services/rabbitmq"
