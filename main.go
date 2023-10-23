@@ -12,6 +12,8 @@ import (
 	"github.com/starlingilcruz/golang-chat/internal/models"
 	"github.com/starlingilcruz/golang-chat/http/routes"
 	"github.com/starlingilcruz/golang-chat/http/middlewares"
+	"github.com/starlingilcruz/golang-chat/services/rabbitmq"
+
 
 	
 )
@@ -26,6 +28,11 @@ func main() {
 		fmt.Println("Error loading .env file")
 		return
 	}
+
+	// Connect Rabbit MQ
+	conn, ch := rabbitmq.Connect()
+	defer conn.Close()
+	defer ch.Close()
 
 	// instantiate mux routes
 	db.Connect()

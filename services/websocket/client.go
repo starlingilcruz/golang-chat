@@ -59,7 +59,7 @@ func (c *Client) Read(channel chan []byte) {
 		body.Email = c.User.Email
 		message := Message{Type: mType, Body: body}
 		c.Pool.Broadcast <- message
-
+		
 		if strings.Index(body.Message, "/stock=") == 0 {
 			channel <- payload
 		} else {

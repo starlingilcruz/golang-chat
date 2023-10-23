@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"encoding/json"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -22,4 +23,11 @@ func CompareHasAndPassword(hashPwd string, pwd string) bool {
 		return false
 	}
 	return true
+}
+
+func ParseByteArray(r []byte, x interface{}) error {
+	if err := json.Unmarshal(r, x); err != nil {
+		return err
+	}
+	return nil
 }
