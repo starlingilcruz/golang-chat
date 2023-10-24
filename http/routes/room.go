@@ -16,6 +16,7 @@ func RegisterRoomRoutes(router *mux.Router) {
 	sr := router.PathPrefix("/v1/api/rooms").Subrouter()
 	// Add content-type json to all sub-routes
 	sr.Use(middlewares.HeaderMiddleware)
+	sr.Use(middlewares.AuthMiddleware)
 
 	var room controllers.RoomController
 	room.RegisterService(services.Room{})
