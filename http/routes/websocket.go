@@ -34,8 +34,11 @@ var RegisterWebSocketRoutes = func(router *mux.Router) {
 		roomId    := r.URL.Query().Get("roomId")
 		token     := r.URL.Query().Get("token")
 		claims, _ := utils.VerifyJWT(token)
+
+		if utils.IsValidToken(token) == false {
+			return
+		}
 		
-		// TODO handle unauthenticated request
 		clientUser := websocket.User{
 			Email:      claims["email"].(string),
 			UserId:     uint(claims["userid"].(float64)),

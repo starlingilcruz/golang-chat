@@ -19,7 +19,6 @@ func RegisterAuthRoutes(router *mux.Router) {
 
 	var auth controllers.AuthController
 	auth.RegisterService(services.Auth{})
-	// auth.RegisterService(services.NewAuthService())
 
 	sr.HandleFunc("/login", auth.Login).Methods("POST")
 	sr.HandleFunc("/signup", auth.SignUp).Methods("POST")

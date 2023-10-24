@@ -36,17 +36,35 @@ func GenerateJWT(user models.User) (string, error) {
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
 
+func ParseJWT(token string) (*jwt.Token, error)  {
+	return jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+}
+
 func VerifyJWT(token string) (jwt.MapClaims, error) {
-		parsedJWT, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-			return []byte(os.Getenv("JWT_SECRET")), nil
-		})
+		parsedJWT, err := ParseJWT(token)
 
 		if err != nil {
 			log.Fatalf("Couldn't parse token: %v", err)
 		}
 
 		return parsedJWT.Claims.(jwt.MapClaims), err
+}
+
+func IsValidToken(token string) bool {
+	parsedJWT, err := ParseJWT(token)
+
+	if err != nil {
+		return false
+	}
+
+	if _, ok := parsedJWT.Claims.(jwt.Claims); !ok && !parsedJWT.Valid {
+		return false
+	}
+
+	return true
 }
