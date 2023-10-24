@@ -12,10 +12,7 @@ import (
 	"github.com/starlingilcruz/golang-chat/internal/models"
 	"github.com/starlingilcruz/golang-chat/http/routes"
 	"github.com/starlingilcruz/golang-chat/http/middlewares"
-	"github.com/starlingilcruz/golang-chat/services/rabbitmq"
-
-
-	
+	"github.com/starlingilcruz/golang-chat/services/rabbitmq"	
 )
 
 
@@ -23,11 +20,7 @@ func main() {
 	fmt.Println("Starting Server...")
 	
 	// Load env values
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-		return
-	}
+	godotenv.Load()
 
 	// Connect Rabbit MQ
 	conn, ch := rabbitmq.Connect()
@@ -53,7 +46,7 @@ func StartHttpServer() {
 
 	srv := &http.Server{
 		Handler: handler,
-		Addr:    "127.0.0.1:8000",
+		Addr:    "0.0.0.0:8000",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

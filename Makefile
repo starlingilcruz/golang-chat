@@ -10,10 +10,6 @@ clean:
 	- docker rm $$(docker ps -aq -f name=postgresDB)
 	- docker rm $$(docker ps -aq -f name=rabbitmqGO)
 
-run:
+run-deps:
 	- make postgres
 	- make rabbitmq
-
-# access database container
-epo: 
-	docker exec -ti postgresDB bash

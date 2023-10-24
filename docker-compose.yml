@@ -1,0 +1,60 @@
+version: '2'
+
+services:
+  postgres:
+    image: postgres:16.0-alpine3.18
+    container_name: postgresGO
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - golangchat
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmqGO
+    restart: always
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    networks:
+      - golangchat
+
+  chatapp:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_SSL_MODE=disable
+      - DB_TIMEZONE=UTC
+      - JWT_ISSUER="golang-chat"
+      - JWT_SECRET="secret"
+      - JWT_AUDIENCE="golang-chat"
+      - RMQ_USERNAME=rabbitmq
+      - RMQ_PASSWORD=rabbitmq
+      - RMQ_HOST=rabbitmq
+      - RMQ_PORT=5672
+      - BR_CONSUMER_QUEUE=stockbot-publisher
+      - BR_PRODUCER_QUEUE=stockbot-receiver
+    networks:
+      - golangchat
+
+networks:
+  golangchat:
+    driver: bridge
